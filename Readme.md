@@ -1,4 +1,4 @@
-### 🔥 UCT 24-Hour Hackathon 🔥
+# 🔥 UCT 24-Hour Hackathon 🔥
 
 Free hoodies. Free food. Free energy drinks.
 One weekend to build something big and stand out 🚀
@@ -25,12 +25,10 @@ Connect with other innovators and future collaborators 🤝
 📲 Register now to secure your spot:
 👉 https://forms.gle/Gs9ev7amXfr19nNB7 
 
-### Links
+## Links
 
 https://academy.blockdag.network/
 
 https://ide.primordial.bdagscan.com/
 
 https://docs.blockdagnetwork.io/
-
-### Rules
