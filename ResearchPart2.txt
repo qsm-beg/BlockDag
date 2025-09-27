@@ -1,0 +1,23 @@
+## Presentation Summary: Transformer Failure Economic Impact
+
+### Cost to Eskom
+- **Replacement costs vastly underestimated:** Commonly cited R60,000 vs. actual R286,000-R690,000 for distribution transformers, R69.3 million for transmission transformers
+- **R7 billion contract** for 101 transmission transformers over 4 years
+- **6,000 power transformers + 400,000 distribution transformers** at risk
+- **R221 million** infrastructure crime costs (April 2024-Feb 2025)
+- **R300 billion** needed for environmental compliance (only R67 billion approved)
+- Single failures catastrophic: Medupi Unit 4 explosion = **R2.8 billion**, offline 4 years
+
+### Cost to South Africa's Economy
+- **R2.8 trillion total economic impact in 2023**
+- **GDP reduced by 2.1 percentage points** annually
+- **650,000 jobs eliminated**, 350,000 potential jobs lost
+- **Daily losses:** R204 million (Stage 3) to R899 million (Stage 6)
+- **Sector impacts:** 
+  - Manufacturing: 40% of total costs
+  - Agriculture: R12 billion losses since 2022
+  - Small business: 30% lack backup power, 20% considering closure
+- **Hidden costs:** R33 billion annual health impacts, 2,200 premature deaths yearly
+
+### Critical Insight
+**Prevention ROI: 200-1000% within 2-5 years.** Monitoring systems cost 0.1-0.5% of replacement value but prevent 40% of failures. Investment of R25,000 monitoring on R500,000 transformer pays back by preventing just 1 in 20 failures.
