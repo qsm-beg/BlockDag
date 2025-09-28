@@ -116,10 +116,10 @@ export default function WalletConnectionSection({
         </View>
 
         <View style={styles.balanceContainer}>
-          <Text style={styles.balanceLabel}>BDAG Balance</Text>
+          <Text style={styles.balanceLabel}>Balance</Text>
           <View style={styles.balanceRow}>
-            <Text style={styles.balanceValue}>{balance.toFixed(4)}</Text>
-            <Text style={styles.balanceUnit}>BDAG</Text>
+            <Text style={styles.balanceUnit}>R</Text>
+            <Text style={styles.balanceValue}>{balance.toFixed(2)}</Text>
           </View>
         </View>
       </View>
@@ -224,8 +224,8 @@ const styles = StyleSheet.create({
     color: colors.accent.cyan,
   },
   balanceUnit: {
-    fontSize: fontSize.md,
+    fontSize: fontSize.xl,
     color: colors.text.secondary,
-    marginLeft: spacing.xs,
+    marginRight: spacing.xs,
   },
 });

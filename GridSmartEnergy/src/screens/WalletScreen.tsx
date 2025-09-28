@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Alert, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Clipboard from 'expo-clipboard';
-import { colors, spacing } from '../styles/theme';
+import { colors, spacing, fontSize } from '../styles/theme';
 
 import WalletConnectionSection from '../components/WalletConnectionSection';
-import PendingRewardsCard from '../components/PendingRewardsCard';
 import ActivityFeed, { Activity } from '../components/ActivityFeed';
 import StatsSummary from '../components/StatsSummary';
 
@@ -13,10 +12,6 @@ export default function WalletScreen() {
   const [isConnected, setIsConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [balance, setBalance] = useState(0);
-  const [pendingRewards, setPendingRewards] = useState(45.75);
-  const [lastClaimDate, setLastClaimDate] = useState<Date | undefined>(
-    new Date(Date.now() - 86400000 * 3)
-  );
   const [activities, setActivities] = useState<Activity[]>([]);
   const [stats, setStats] = useState({
     totalEarned: 326,
@@ -80,7 +75,7 @@ export default function WalletScreen() {
     setTimeout(() => {
       setIsConnected(true);
       setWalletAddress('0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8');
-      setBalance(125.4567);
+      setBalance(326.00);
       Alert.alert(
         'Wallet Connected!',
         'Your BlockDAG wallet has been successfully connected.',
@@ -96,47 +91,6 @@ export default function WalletScreen() {
     ]);
   };
 
-  const handleClaim = () => {
-    if (pendingRewards > 0) {
-      Alert.alert(
-        'Claim Rewards',
-        `Claim R${pendingRewards.toFixed(2)} to your wallet?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Claim',
-            onPress: () => {
-              const claimedAmount = pendingRewards;
-              setPendingRewards(0);
-              setLastClaimDate(new Date());
-              setBalance((prev) => prev + claimedAmount / 10);
-
-              const newActivity: Activity = {
-                id: Date.now().toString(),
-                type: 'claim',
-                description: 'Claimed pending rewards',
-                amount: claimedAmount,
-                timestamp: new Date(),
-                status: 'completed',
-              };
-
-              setActivities([newActivity, ...activities]);
-              setStats((prev) => ({
-                ...prev,
-                totalEarned: prev.totalEarned + claimedAmount,
-              }));
-
-              Alert.alert(
-                'Success!',
-                `R${claimedAmount.toFixed(2)} has been added to your wallet.`,
-                [{ text: 'OK', style: 'default' }]
-              );
-            },
-          },
-        ]
-      );
-    }
-  };
 
   return (
     <LinearGradient
@@ -145,6 +99,12 @@ export default function WalletScreen() {
     >
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="light-content" />
+
+        <View style={styles.header}>
+          <Text style={styles.title}>Wallet</Text>
+          <Text style={styles.subtitle}>Your Energy Earnings Hub</Text>
+        </View>
+
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -160,13 +120,6 @@ export default function WalletScreen() {
 
           {isConnected && (
             <>
-              <PendingRewardsCard
-                pendingAmount={pendingRewards}
-                lastClaimDate={lastClaimDate}
-                onClaim={handleClaim}
-                isClaimable={pendingRewards > 0}
-              />
-
               <ActivityFeed activities={activities} />
 
               <StatsSummary
@@ -190,6 +143,21 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  header: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: fontSize.xxxl,
+    fontWeight: 'bold',
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+  },
+  subtitle: {
+    fontSize: fontSize.md,
+    color: colors.text.secondary,
   },
   scrollView: {
     flex: 1,
