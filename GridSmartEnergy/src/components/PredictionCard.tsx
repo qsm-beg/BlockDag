@@ -144,20 +144,6 @@ export default function PredictionCard({ prediction, onParticipate }: Prediction
           </Text>
         </View>
 
-        {prediction.status === 'upcoming' && (
-          <TouchableOpacity style={styles.participateButton} onPress={onParticipate}>
-            <LinearGradient
-              colors={[colors.accent.cyan, colors.accent.cyanDark]}
-              style={styles.buttonGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.participateButtonText}>Commit to Reduce</Text>
-              <Ionicons name="arrow-forward" size={18} color={colors.white} />
-            </LinearGradient>
-          </TouchableOpacity>
-        )}
-
         {prediction.participationRate !== undefined && (
           <View style={styles.participationContainer}>
             <Ionicons name="people" size={16} color={colors.text.secondary} />
@@ -256,22 +242,6 @@ const styles = StyleSheet.create({
   probabilityText: {
     fontSize: 12,
     color: colors.text.secondary,
-  },
-  participateButton: {
-    marginTop: spacing.sm,
-  },
-  buttonGradient: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    borderRadius: 12,
-  },
-  participateButtonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '600',
-    marginRight: spacing.xs,
   },
   participationContainer: {
     flexDirection: 'row',

@@ -14,18 +14,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing } from '../styles/theme';
 import PredictionCard from '../components/PredictionCard';
 import PredictionHistory from '../components/PredictionHistory';
-import AccuracyMetrics from '../components/AccuracyMetrics';
 import { predictionService, Prediction, PredictionRecord } from '../services/predictionService';
 
 export default function InsightsScreen() {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'history'>('upcoming');
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [history, setHistory] = useState<PredictionRecord[]>([]);
-  const [accuracy, setAccuracy] = useState({
-    weekly: 0,
-    monthly: 0,
-    overloadsPrevented: 0,
-  });
 
   useEffect(() => {
     const unsubscribePredictions = predictionService.subscribeToUpcoming((data) => {
@@ -36,14 +30,9 @@ export default function InsightsScreen() {
       setHistory(data);
     });
 
-    const unsubscribeAccuracy = predictionService.subscribeToAccuracy((data) => {
-      setAccuracy(data);
-    });
-
     return () => {
       unsubscribePredictions();
       unsubscribeHistory();
-      unsubscribeAccuracy();
     };
   }, []);
 
@@ -56,14 +45,9 @@ export default function InsightsScreen() {
         <StatusBar barStyle="light-content" />
 
         <View style={styles.header}>
-          <View style={styles.titleContainer}>
-            <Ionicons name="bulb" size={28} color={colors.accent.yellow} />
-            <Text style={styles.title}>AI Insights</Text>
-          </View>
+          <Text style={styles.title}>AI Insights</Text>
           <Text style={styles.subtitle}>Predictive Grid Intelligence</Text>
         </View>
-
-        <AccuracyMetrics accuracy={accuracy} />
 
         <View style={styles.tabContainer}>
           <TouchableOpacity
@@ -126,22 +110,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
-  },
-  titleContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.xs,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.text.primary,
-    marginLeft: spacing.sm,
+    textAlign: 'center',
+    marginBottom: spacing.xs,
   },
   subtitle: {
     fontSize: 14,
     color: colors.text.secondary,
-    marginLeft: 36,
+    textAlign: 'center',
   },
   tabContainer: {
     flexDirection: 'row',
