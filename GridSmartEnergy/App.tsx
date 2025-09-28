@@ -15,6 +15,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import IncentivesScreen from './src/screens/IncentivesScreen';
 import TradingScreen from './src/screens/TradingScreen';
 import WalletScreen from './src/screens/WalletScreen';
+import InsightsScreen from './src/screens/InsightsScreen';
 import { colors } from './src/styles/theme';
 
 const Tab = createBottomTabNavigator();
@@ -105,6 +106,15 @@ export default function App() {
           options={{
             tabBarIcon: ({ focused, color }) => (
               <TabBarIcon name="swap-horizontal" focused={focused} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Insights"
+          component={InsightsScreen}
+          options={{
+            tabBarIcon: ({ focused, color }) => (
+              <TabBarIcon name="bulb" focused={focused} color={color} />
             ),
           }}
         />
