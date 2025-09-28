@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { colors, spacing } from '../styles/theme';
@@ -9,6 +9,7 @@ import TransformerLoadGauge from '../components/TransformerLoadGauge';
 import AlertBanner from '../components/AlertBanner';
 import UserEnergyStatus from '../components/UserEnergyStatus';
 import dataSimulator, { EnergyData } from '../services/dataSimulator';
+import blockdagService from '../services/blockdagService';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -20,14 +21,64 @@ export default function HomeScreen() {
     incentiveRate: 2.5,
     isPeakTime: false,
   });
+  const [blockchainData, setBlockchainData] = useState<any>(null);
+  const [networkInfo, setNetworkInfo] = useState<any>(null);
 
   useEffect(() => {
+    // Initialize BlockDAG connection
+    initializeBlockchain();
+
+    // Subscribe to data simulator for UI updates
     const unsubscribe = dataSimulator.subscribe((data) => {
       setEnergyData(data);
     });
 
-    return unsubscribe;
+    // Fetch transformer load from blockchain every 5 seconds
+    const interval = setInterval(async () => {
+      await fetchTransformerLoad();
+      await fetchNetworkInfo();
+    }, 5000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
+
+  const initializeBlockchain = async () => {
+    try {
+      const result = await blockdagService.connect();
+      console.log('BlockDAG connected:', result);
+      await fetchTransformerLoad();
+      await fetchNetworkInfo();
+    } catch (error) {
+      console.error('BlockDAG connection failed:', error);
+    }
+  };
+
+  const fetchTransformerLoad = async () => {
+    try {
+      const loadData = await blockdagService.getTransformerLoad();
+      setBlockchainData(loadData);
+      // Update energy data with blockchain values
+      setEnergyData(prev => ({
+        ...prev,
+        transformerLoad: parseFloat(loadData.currentLoad),
+        isPeakTime: blockdagService.isPeakHours(),
+      }));
+    } catch (error) {
+      console.error('Failed to fetch transformer load:', error);
+    }
+  };
+
+  const fetchNetworkInfo = async () => {
+    try {
+      const info = await blockdagService.getNetworkInfo();
+      setNetworkInfo(info);
+    } catch (error) {
+      console.error('Failed to fetch network info:', error);
+    }
+  };
 
   const handleReduceNow = () => {
     navigation.navigate('Incentives' as never);
@@ -46,6 +97,15 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <HeaderSection />
+
+          {networkInfo && (
+            <View style={styles.blockchainStatus}>
+              <Text style={styles.blockchainText}>
+                BlockDAG Network: Block #{networkInfo.blockNumber}
+              </Text>
+              <View style={styles.statusDot} />
+            </View>
+          )}
 
           <TransformerLoadGauge load={energyData.transformerLoad} />
 
@@ -79,5 +139,26 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 100,
+  },
+  blockchainStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.sm,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+    borderRadius: 8,
+  },
+  blockchainText: {
+    color: colors.accent.cyan,
+    fontSize: 12,
+    marginRight: spacing.xs,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.success,
   },
 });

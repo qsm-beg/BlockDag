@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing } from '../styles/theme';
@@ -7,9 +7,13 @@ import { colors, spacing } from '../styles/theme';
 interface UsageCardProps {
   averageDailyUsage: number;
   currentUsage: number;
+  onCommit?: (kwhAmount: number) => void;
+  isCommitting?: boolean;
 }
 
-export default function UsageCard({ averageDailyUsage, currentUsage }: UsageCardProps) {
+export default function UsageCard({ averageDailyUsage, currentUsage, onCommit, isCommitting = false }: UsageCardProps) {
+  const [showCommitForm, setShowCommitForm] = useState(false);
+  const [commitAmount, setCommitAmount] = useState('2');
   return (
     <LinearGradient
       colors={[colors.card.background, colors.card.backgroundDark]}
@@ -38,9 +42,58 @@ export default function UsageCard({ averageDailyUsage, currentUsage }: UsageCard
 
         <View style={styles.divider} />
 
-        <Text style={styles.message}>
-          Reduce usage today to earn incentives
-        </Text>
+        {!showCommitForm ? (
+          <>
+            <Text style={styles.message}>
+              Reduce usage today to earn incentives
+            </Text>
+            {onCommit && (
+              <TouchableOpacity
+                style={styles.commitButton}
+                onPress={() => setShowCommitForm(true)}
+                disabled={isCommitting}
+              >
+                <Text style={styles.commitButtonText}>Commit to Reduce</Text>
+              </TouchableOpacity>
+            )}
+          </>
+        ) : (
+          <View style={styles.commitForm}>
+            <Text style={styles.commitFormLabel}>Commit to reduce (kWh):</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                value={commitAmount}
+                onChangeText={setCommitAmount}
+                keyboardType="numeric"
+                placeholder="2.0"
+                placeholderTextColor={colors.text.secondary}
+              />
+              <TouchableOpacity
+                style={[styles.submitButton, isCommitting && styles.submitButtonDisabled]}
+                onPress={() => {
+                  const amount = parseFloat(commitAmount);
+                  if (amount > 0 && amount <= 50) {
+                    onCommit?.(amount);
+                    setShowCommitForm(false);
+                  }
+                }}
+                disabled={isCommitting}
+              >
+                <Text style={styles.submitButtonText}>
+                  {isCommitting ? 'Processing...' : 'Submit'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowCommitForm(false)}
+                disabled={isCommitting}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </View>
     </LinearGradient>
   );
@@ -105,5 +158,66 @@ const styles = StyleSheet.create({
     color: colors.accent.cyan,
     textAlign: 'center',
     fontWeight: '600',
+  },
+  commitButton: {
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.accent.cyan,
+    borderRadius: 8,
+  },
+  commitButtonText: {
+    color: colors.primary.dark,
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  commitForm: {
+    width: '100%',
+  },
+  commitFormLabel: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  input: {
+    flex: 1,
+    maxWidth: 100,
+    height: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 8,
+    paddingHorizontal: spacing.sm,
+    color: colors.text.primary,
+    borderWidth: 1,
+    borderColor: colors.card.border,
+    textAlign: 'center',
+  },
+  submitButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.success,
+    borderRadius: 8,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  submitButtonText: {
+    color: colors.primary.dark,
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  cancelButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  cancelButtonText: {
+    color: colors.text.secondary,
+    fontSize: 12,
   },
 });

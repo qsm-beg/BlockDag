@@ -7,6 +7,7 @@ import { colors, spacing, fontSize } from '../styles/theme';
 import WalletConnectionSection from '../components/WalletConnectionSection';
 import ActivityFeed, { Activity } from '../components/ActivityFeed';
 import StatsSummary from '../components/StatsSummary';
+import blockdagService from '../services/blockdagService';
 
 export default function WalletScreen() {
   const [isConnected, setIsConnected] = useState(false);
@@ -22,7 +23,28 @@ export default function WalletScreen() {
 
   useEffect(() => {
     generateMockActivities();
+    checkBlockchainConnection();
   }, []);
+
+  const checkBlockchainConnection = async () => {
+    const connectionStatus = blockdagService.isConnected;
+    if (connectionStatus) {
+      setIsConnected(true);
+      setWalletAddress(blockdagService.account || '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8');
+      setBalance(parseFloat(blockdagService.mockBalance));
+
+      // Fetch user stats
+      const userStats = await blockdagService.getUserIncentiveStats();
+      if (userStats) {
+        setStats({
+          totalEarned: parseFloat(userStats.totalRewards.replace(' BDAG', '')),
+          energySaved: parseFloat(userStats.totalReductions.replace(' kWh', '')),
+          tradesCompleted: 18, // Mock for now
+          currentStreak: userStats.currentCommitments || 0,
+        });
+      }
+    }
+  };
 
   const generateMockActivities = () => {
     const mockActivities: Activity[] = [
@@ -71,17 +93,32 @@ export default function WalletScreen() {
     setActivities(mockActivities);
   };
 
-  const handleConnect = () => {
-    setTimeout(() => {
-      setIsConnected(true);
-      setWalletAddress('0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8');
-      setBalance(326.00);
+  const handleConnect = async () => {
+    try {
+      const result = await blockdagService.connect();
+
+      if (result.success) {
+        setIsConnected(true);
+        setWalletAddress(result.account);
+        setBalance(parseFloat(result.balance));
+
+        const networkInfo = await blockdagService.getNetworkInfo();
+
+        Alert.alert(
+          'Wallet Connected!',
+          `Connected to BlockDAG ${result.mode === 'simulation' ? '(Demo Mode)' : 'Testnet'}\n\nNetwork: ${networkInfo.name}\nBlock: ${networkInfo.blockNumber}\nAddress: ${result.account.substring(0, 10)}...`,
+          [{ text: 'OK', style: 'default' }]
+        );
+
+        await checkBlockchainConnection();
+      }
+    } catch (error) {
       Alert.alert(
-        'Wallet Connected!',
-        'Your BlockDAG wallet has been successfully connected.',
-        [{ text: 'OK', style: 'default' }]
+        'Connection Failed',
+        'Could not connect to BlockDAG network. Using demo mode.',
+        [{ text: 'OK' }]
       );
-    }, 1500);
+    }
   };
 
   const handleCopyAddress = async () => {

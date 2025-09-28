@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Text, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing } from '../styles/theme';
 
@@ -7,6 +7,7 @@ import CurrentEventCard from '../components/CurrentEventCard';
 import UsageCard from '../components/UsageCard';
 import EarningsHistory from '../components/EarningsHistory';
 import dataSimulator, { EnergyData } from '../services/dataSimulator';
+import blockdagService from '../services/blockdagService';
 
 interface EarningItem {
   id: string;
@@ -30,6 +31,8 @@ export default function IncentivesScreen() {
   const [todayTotal, setTodayTotal] = useState(0);
   const [weeklyTotal, setWeeklyTotal] = useState(0);
   const [averageDailyUsage] = useState(25.8); // Mock average daily usage
+  const [userStats, setUserStats] = useState<any>(null);
+  const [isCommitting, setIsCommitting] = useState(false);
 
   useEffect(() => {
     const unsubscribe = dataSimulator.subscribe((data) => {
@@ -37,9 +40,67 @@ export default function IncentivesScreen() {
     });
 
     generateMockEarnings();
+    fetchUserStats();
 
-    return unsubscribe;
+    // Refresh user stats every 10 seconds
+    const interval = setInterval(fetchUserStats, 10000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
+
+  const fetchUserStats = async () => {
+    try {
+      const stats = await blockdagService.getUserIncentiveStats();
+      setUserStats(stats);
+    } catch (error) {
+      console.error('Failed to fetch user stats:', error);
+    }
+  };
+
+  const handleCommitReduction = async (kwhAmount: number) => {
+    if (isCommitting) return;
+
+    setIsCommitting(true);
+    try {
+      const result = await blockdagService.commitReduction(kwhAmount);
+
+      Alert.alert(
+        'Commitment Successful!',
+        `You committed to reduce ${kwhAmount} kWh.\n\nTransaction: ${result.hash.substring(0, 10)}...\n\nEstimated Reward: ${result.estimatedReward} BDAG`,
+        [
+          {
+            text: 'View on Explorer',
+            onPress: () => console.log('Opening:', result.explorerUrl)
+          },
+          { text: 'OK' }
+        ]
+      );
+
+      // Refresh user stats after commitment
+      await fetchUserStats();
+
+      // Add to earnings history
+      const newEarning: EarningItem = {
+        id: result.hash,
+        timestamp: new Date(),
+        amount: parseFloat(result.estimatedReward),
+        kwhReduced: kwhAmount,
+        type: 'reduction',
+      };
+
+      setEarnings(prev => [newEarning, ...prev]);
+      setTodayTotal(prev => prev + parseFloat(result.estimatedReward));
+
+    } catch (error) {
+      Alert.alert('Error', 'Failed to commit reduction. Please try again.');
+      console.error('Commitment error:', error);
+    } finally {
+      setIsCommitting(false);
+    }
+  };
 
   const generateMockEarnings = () => {
     const mockEarnings: EarningItem[] = [
@@ -158,6 +219,8 @@ export default function IncentivesScreen() {
           <UsageCard
             averageDailyUsage={averageDailyUsage}
             currentUsage={energyData.currentUsage * 8} // Mock daily projection
+            onCommit={handleCommitReduction}
+            isCommitting={isCommitting}
           />
 
           <EarningsHistory
