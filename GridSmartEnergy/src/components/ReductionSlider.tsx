@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import Slider from '@react-native-community/slider';
+import CustomSlider from './CustomSlider';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -62,17 +62,18 @@ export default function ReductionSlider({ incentiveRate, onValueChange, value }:
 
       <View style={styles.sliderContainer}>
         <Text style={styles.sliderLabel}>0</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={5}
-          value={value}
-          onValueChange={onValueChange}
-          minimumTrackTintColor={colors.accent.cyan}
-          maximumTrackTintColor={colors.card.background}
-          thumbTintColor={colors.accent.cyan}
-          step={0.1}
-        />
+        <View style={styles.slider}>
+          <CustomSlider
+            minimumValue={0}
+            maximumValue={5}
+            value={value}
+            onValueChange={onValueChange}
+            minimumTrackTintColor={colors.accent.cyan}
+            maximumTrackTintColor={colors.card.background}
+            thumbTintColor={colors.accent.cyan}
+            step={0.1}
+          />
+        </View>
         <Text style={styles.sliderLabel}>5</Text>
       </View>
 
@@ -126,7 +127,6 @@ const styles = StyleSheet.create({
   },
   slider: {
     flex: 1,
-    height: 40,
     marginHorizontal: spacing.sm,
   },
   sliderLabel: {
