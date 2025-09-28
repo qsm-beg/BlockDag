@@ -92,6 +92,15 @@ export default function App() {
           }}
         />
         <Tab.Screen
+          name="Insights"
+          component={InsightsScreen}
+          options={{
+            tabBarIcon: ({ focused, color }) => (
+              <TabBarIcon name="bulb" focused={focused} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
           name="Incentives"
           component={IncentivesScreen}
           options={{
@@ -106,15 +115,6 @@ export default function App() {
           options={{
             tabBarIcon: ({ focused, color }) => (
               <TabBarIcon name="swap-horizontal" focused={focused} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Insights"
-          component={InsightsScreen}
-          options={{
-            tabBarIcon: ({ focused, color }) => (
-              <TabBarIcon name="bulb" focused={focused} color={color} />
             ),
           }}
         />
