@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Alert, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing } from '../styles/theme';
+import { colors, spacing, fontSize } from '../styles/theme';
 
 import EnergyBalanceCard from '../components/EnergyBalanceCard';
 import QuickTradeSection from '../components/QuickTradeSection';
@@ -25,6 +25,7 @@ export default function TradingScreen() {
   const [showTradeAnimation, setShowTradeAnimation] = useState(false);
   const [tradeType, setTradeType] = useState<'buy' | 'sell'>('sell');
   const [tradeAmount, setTradeAmount] = useState(0);
+  const [dailyAverage] = useState(4.5);
 
   useEffect(() => {
     const unsubscribe = dataSimulator.subscribe((data) => {
@@ -143,6 +144,12 @@ export default function TradingScreen() {
     >
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="light-content" />
+
+        <View style={styles.header}>
+          <Text style={styles.title}>Energy Trading</Text>
+          <Text style={styles.subtitle}>P2P Energy Marketplace</Text>
+        </View>
+
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -151,6 +158,7 @@ export default function TradingScreen() {
           <EnergyBalanceCard
             netUsage={energyData.netUsage}
             solarGeneration={energyData.solarGeneration}
+            dailyAverage={dailyAverage}
           />
 
           <QuickTradeSection
@@ -186,11 +194,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
+  header: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+  },
+  subtitle: {
+    fontSize: fontSize.md,
+    color: colors.text.secondary,
+    opacity: 0.8,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingBottom: 100,
-    paddingTop: spacing.sm,
+    paddingTop: spacing.xs,
   },
 });

@@ -15,9 +15,10 @@ import { colors, spacing, fontSize, borderRadius } from '../styles/theme';
 interface EnergyBalanceCardProps {
   netUsage: number;
   solarGeneration: number;
+  dailyAverage?: number;
 }
 
-export default function EnergyBalanceCard({ netUsage, solarGeneration }: EnergyBalanceCardProps) {
+export default function EnergyBalanceCard({ netUsage, solarGeneration, dailyAverage = 4.5 }: EnergyBalanceCardProps) {
   const hasExcess = solarGeneration > netUsage;
   const balance = hasExcess ? solarGeneration - netUsage : netUsage - solarGeneration;
   const pulseAnimation = useSharedValue(0);
@@ -55,24 +56,38 @@ export default function EnergyBalanceCard({ netUsage, solarGeneration }: EnergyB
       <View style={styles.content}>
         <View style={styles.header}>
           <Ionicons
-            name={hasExcess ? 'sunny' : 'flash'}
-            size={32}
+            name="analytics"
+            size={28}
             color={colors.text.primary}
           />
-          <Text style={styles.statusText}>
-            {hasExcess ? 'Energy Surplus' : 'Energy Deficit'}
-          </Text>
+          <Text style={styles.statusText}>Energy Status</Text>
         </View>
 
-        <View style={styles.balanceContainer}>
-          <Text style={styles.balanceValue}>{balance.toFixed(2)}</Text>
-          <Text style={styles.balanceUnit}>kWh</Text>
+        <View style={styles.dailyAverageContainer}>
+          <Text style={styles.dailyAverageLabel}>Your daily average consumption is</Text>
+          <View style={styles.dailyAverageValueContainer}>
+            <Text style={styles.dailyAverageValue}>{dailyAverage.toFixed(1)}</Text>
+            <Text style={styles.dailyAverageUnit}>kWh</Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.statusContainer}>
+          <Ionicons
+            name={hasExcess ? 'sunny' : 'flash'}
+            size={24}
+            color={hasExcess ? colors.accent.turquoise : colors.status.warning}
+          />
+          <Text style={[styles.statusLabel, hasExcess ? styles.surplusText : styles.deficitText]}>
+            {hasExcess ? 'SURPLUS' : 'DEFICIT'}
+          </Text>
         </View>
 
         <Text style={styles.description}>
           {hasExcess
-            ? 'You have excess solar energy to trade'
-            : 'You may need to purchase energy'}
+            ? `You currently have ${balance.toFixed(2)} kWh excess solar energy to trade`
+            : `You have gone above your daily average consumption. You may need to purchase energy`}
         </Text>
 
         {solarGeneration > 0 && (
@@ -121,22 +136,52 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginLeft: spacing.sm,
   },
-  balanceContainer: {
+  dailyAverageContainer: {
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  dailyAverageLabel: {
+    fontSize: fontSize.md,
+    color: colors.text.primary,
+    opacity: 0.9,
+  },
+  dailyAverageValueContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    justifyContent: 'center',
-    marginVertical: spacing.md,
+    marginTop: spacing.xs,
   },
-  balanceValue: {
-    fontSize: 48,
+  dailyAverageValue: {
+    fontSize: 36,
     fontWeight: 'bold',
     color: colors.text.primary,
   },
-  balanceUnit: {
-    fontSize: fontSize.xl,
+  dailyAverageUnit: {
+    fontSize: fontSize.lg,
     color: colors.text.primary,
     marginLeft: spacing.xs,
     opacity: 0.8,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    marginVertical: spacing.md,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+  },
+  statusLabel: {
+    fontSize: fontSize.lg,
+    fontWeight: 'bold',
+    marginLeft: spacing.sm,
+  },
+  surplusText: {
+    color: colors.accent.turquoise,
+  },
+  deficitText: {
+    color: colors.status.warning,
   },
   description: {
     fontSize: fontSize.md,

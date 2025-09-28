@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing } from '../styles/theme';
 
@@ -138,6 +138,12 @@ export default function IncentivesScreen() {
     >
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="light-content" />
+
+        <View style={styles.header}>
+          <Text style={styles.title}>Earn Rewards</Text>
+          <Text style={styles.subtitle}>Reduce consumption, earn instantly</Text>
+        </View>
+
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -172,6 +178,24 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  header: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: colors.text.primary,
+    textAlign: 'center',
+    marginBottom: spacing.xs,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
