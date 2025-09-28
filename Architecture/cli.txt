@@ -1,0 +1,10 @@
+Files for continous integration
+
+Production roadmap
+
+Your MVP demonstrates the complete concept while being realistic about what's production-ready vs. what needs further development. The judges will see:
+
+Working blockchain solution on BlockDAG
+Realistic problem/solution fit for South African context
+Clear technical architecture with smart contracts
+Production roadmap showing scalability planning
