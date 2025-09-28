@@ -145,18 +145,19 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   header: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSize.xxxl,
+    fontSize: 28,
     fontWeight: 'bold',
     color: colors.text.primary,
     marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: fontSize.md,
+    fontSize: 14,
     color: colors.text.secondary,
   },
   scrollView: {

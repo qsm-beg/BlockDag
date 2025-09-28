@@ -25,7 +25,7 @@ export default function TradingScreen() {
   const [showTradeAnimation, setShowTradeAnimation] = useState(false);
   const [tradeType, setTradeType] = useState<'buy' | 'sell'>('sell');
   const [tradeAmount, setTradeAmount] = useState(0);
-  const [dailyAverage] = useState(4.5);
+  const [dailyAverage] = useState(23);
 
   useEffect(() => {
     const unsubscribe = dataSimulator.subscribe((data) => {
