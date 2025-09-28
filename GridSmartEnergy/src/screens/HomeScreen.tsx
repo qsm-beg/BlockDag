@@ -8,9 +8,7 @@ import HeaderSection from '../components/HeaderSection';
 import TransformerLoadGauge from '../components/TransformerLoadGauge';
 import AlertBanner from '../components/AlertBanner';
 import UserEnergyStatus from '../components/UserEnergyStatus';
-import PredictionAlert from '../components/PredictionAlert';
 import dataSimulator, { EnergyData } from '../services/dataSimulator';
-import { predictionService, Prediction } from '../services/predictionService';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -22,21 +20,13 @@ export default function HomeScreen() {
     incentiveRate: 2.5,
     isPeakTime: false,
   });
-  const [nextPrediction, setNextPrediction] = useState<Prediction | null>(null);
 
   useEffect(() => {
     const unsubscribe = dataSimulator.subscribe((data) => {
       setEnergyData(data);
     });
 
-    const unsubscribePrediction = predictionService.subscribeToAlerts((prediction) => {
-      setNextPrediction(prediction);
-    });
-
-    return () => {
-      unsubscribe();
-      unsubscribePrediction();
-    };
+    return unsubscribe;
   }, []);
 
   const handleReduceNow = () => {
@@ -56,8 +46,6 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <HeaderSection />
-
-          <PredictionAlert prediction={nextPrediction} />
 
           <TransformerLoadGauge load={energyData.transformerLoad} />
 
