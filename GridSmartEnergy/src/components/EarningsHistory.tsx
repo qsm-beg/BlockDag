@@ -8,7 +8,7 @@ interface EarningItem {
   timestamp: Date;
   amount: number;
   kwhReduced: number;
-  type: 'reduction' | 'trade';
+  type: 'reduction';
 }
 
 interface EarningsHistoryProps {
@@ -32,16 +32,6 @@ export default function EarningsHistory({ earnings, todayTotal, weeklyTotal }: E
     return date.toLocaleDateString();
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'reduction':
-        return 'flash';
-      case 'trade':
-        return 'swap-horizontal';
-      default:
-        return 'cash';
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -74,16 +64,14 @@ export default function EarningsHistory({ earnings, todayTotal, weeklyTotal }: E
             <View key={item.id} style={styles.earningItem}>
               <View style={styles.iconContainer}>
                 <Ionicons
-                  name={getIcon(item.type) as any}
+                  name="flash"
                   size={20}
                   color={colors.accent.cyan}
                 />
               </View>
               <View style={styles.itemContent}>
                 <View style={styles.itemHeader}>
-                  <Text style={styles.itemType}>
-                    {item.type === 'reduction' ? 'Energy Reduction' : 'P2P Trade'}
-                  </Text>
+                  <Text style={styles.itemType}>Energy Reduction</Text>
                   <Text style={styles.itemAmount}>+R{item.amount.toFixed(2)}</Text>
                 </View>
                 <View style={styles.itemDetails}>

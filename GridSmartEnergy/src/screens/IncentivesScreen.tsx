@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing } from '../styles/theme';
 
 import CurrentEventCard from '../components/CurrentEventCard';
-import ReductionSlider from '../components/ReductionSlider';
+import UsageCard from '../components/UsageCard';
 import EarningsHistory from '../components/EarningsHistory';
-import CommitButton from '../components/CommitButton';
 import dataSimulator, { EnergyData } from '../services/dataSimulator';
 
 interface EarningItem {
@@ -14,7 +13,7 @@ interface EarningItem {
   timestamp: Date;
   amount: number;
   kwhReduced: number;
-  type: 'reduction' | 'trade';
+  type: 'reduction';
 }
 
 export default function IncentivesScreen() {
@@ -27,11 +26,10 @@ export default function IncentivesScreen() {
     isPeakTime: false,
   });
 
-  const [reductionAmount, setReductionAmount] = useState(0);
-  const [isCommitting, setIsCommitting] = useState(false);
   const [earnings, setEarnings] = useState<EarningItem[]>([]);
   const [todayTotal, setTodayTotal] = useState(0);
   const [weeklyTotal, setWeeklyTotal] = useState(0);
+  const [averageDailyUsage] = useState(25.8); // Mock average daily usage
 
   useEffect(() => {
     const unsubscribe = dataSimulator.subscribe((data) => {
@@ -48,23 +46,51 @@ export default function IncentivesScreen() {
       {
         id: '1',
         timestamp: new Date(Date.now() - 3600000),
-        amount: 12.50,
-        kwhReduced: 3.5,
+        amount: 65.50,
+        kwhReduced: 18.7,
         type: 'reduction',
       },
       {
         id: '2',
         timestamp: new Date(Date.now() - 7200000),
-        amount: 8.00,
-        kwhReduced: 2.3,
+        amount: 48.00,
+        kwhReduced: 13.7,
         type: 'reduction',
       },
       {
         id: '3',
         timestamp: new Date(Date.now() - 14400000),
-        amount: 5.50,
-        kwhReduced: 1.5,
-        type: 'trade',
+        amount: 52.50,
+        kwhReduced: 15.0,
+        type: 'reduction',
+      },
+      {
+        id: '4',
+        timestamp: new Date(Date.now() - 86400000), // Yesterday
+        amount: 58.75,
+        kwhReduced: 16.8,
+        type: 'reduction',
+      },
+      {
+        id: '5',
+        timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
+        amount: 71.25,
+        kwhReduced: 20.4,
+        type: 'reduction',
+      },
+      {
+        id: '6',
+        timestamp: new Date(Date.now() - 86400000 * 3), // 3 days ago
+        amount: 45.00,
+        kwhReduced: 12.9,
+        type: 'reduction',
+      },
+      {
+        id: '7',
+        timestamp: new Date(Date.now() - 86400000 * 4), // 4 days ago
+        amount: 62.50,
+        kwhReduced: 17.8,
+        type: 'reduction',
       },
     ];
 
@@ -80,37 +106,6 @@ export default function IncentivesScreen() {
 
     setTodayTotal(today);
     setWeeklyTotal(mockEarnings.reduce((sum, e) => sum + e.amount, 0));
-  };
-
-  const handleCommit = async () => {
-    if (reductionAmount === 0) return;
-
-    setIsCommitting(true);
-
-    setTimeout(() => {
-      const newEarning: EarningItem = {
-        id: Date.now().toString(),
-        timestamp: new Date(),
-        amount: reductionAmount * energyData.incentiveRate,
-        kwhReduced: reductionAmount,
-        type: 'reduction',
-      };
-
-      setEarnings([newEarning, ...earnings]);
-      setTodayTotal(todayTotal + newEarning.amount);
-      setWeeklyTotal(weeklyTotal + newEarning.amount);
-
-      Alert.alert(
-        'Commitment Successful!',
-        `You've committed to reduce ${reductionAmount.toFixed(1)} kWh and will earn R${(
-          reductionAmount * energyData.incentiveRate
-        ).toFixed(2)}`,
-        [{ text: 'OK', style: 'default' }]
-      );
-
-      setReductionAmount(0);
-      setIsCommitting(false);
-    }, 1500);
   };
 
   const getEventEndTime = () => {
@@ -154,16 +149,9 @@ export default function IncentivesScreen() {
             endTime={getEventEndTime()}
           />
 
-          <ReductionSlider
-            incentiveRate={energyData.incentiveRate}
-            value={reductionAmount}
-            onValueChange={setReductionAmount}
-          />
-
-          <CommitButton
-            onPress={handleCommit}
-            disabled={reductionAmount === 0 || !energyData.isPeakTime}
-            isLoading={isCommitting}
+          <UsageCard
+            averageDailyUsage={averageDailyUsage}
+            currentUsage={energyData.currentUsage * 8} // Mock daily projection
           />
 
           <EarningsHistory

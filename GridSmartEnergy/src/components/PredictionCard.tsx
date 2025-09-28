@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing } from '../styles/theme';
@@ -11,34 +11,7 @@ interface PredictionCardProps {
 }
 
 export default function PredictionCard({ prediction, onParticipate }: PredictionCardProps) {
-  const [timeRemaining, setTimeRemaining] = useState('');
   const pulseAnim = new Animated.Value(1);
-
-  useEffect(() => {
-    const updateTimer = () => {
-      const now = new Date();
-      const start = new Date(prediction.timeRange.start);
-      const diff = start.getTime() - now.getTime();
-
-      if (diff > 0) {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-        if (hours > 0) {
-          setTimeRemaining(`${hours}h ${minutes}m`);
-        } else {
-          setTimeRemaining(`${minutes} minutes`);
-        }
-      } else {
-        setTimeRemaining('Active Now');
-      }
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 60000);
-
-    return () => clearInterval(interval);
-  }, [prediction]);
 
   useEffect(() => {
     if (prediction.status === 'active' || prediction.probability > 80) {
@@ -73,19 +46,6 @@ export default function PredictionCard({ prediction, onParticipate }: Prediction
     return colors.accent.green;
   };
 
-  const getStatusIcon = () => {
-    switch (prediction.status) {
-      case 'active':
-        return 'flash';
-      case 'upcoming':
-        return 'time';
-      case 'completed':
-        return 'checkmark-circle';
-      default:
-        return 'alert-circle';
-    }
-  };
-
   return (
     <Animated.View style={[styles.container, { transform: [{ scale: pulseAnim }] }]}>
       <LinearGradient
@@ -103,18 +63,6 @@ export default function PredictionCard({ prediction, onParticipate }: Prediction
             <Ionicons name="location" size={20} color={colors.accent.cyan} />
             <Text style={styles.location}>{prediction.area}</Text>
             <Text style={styles.city}>{prediction.city}</Text>
-          </View>
-          <View style={[styles.statusBadge, prediction.status === 'active' && styles.activeBadge]}>
-            <Ionicons
-              name={getStatusIcon()}
-              size={14}
-              color={prediction.status === 'active' ? colors.white : colors.text.secondary}
-            />
-            <Text
-              style={[styles.statusText, prediction.status === 'active' && styles.activeStatusText]}
-            >
-              {timeRemaining}
-            </Text>
           </View>
         </View>
 
@@ -191,26 +139,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text.secondary,
     marginLeft: spacing.xs,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary.backgroundDark,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: 20,
-  },
-  activeBadge: {
-    backgroundColor: colors.white,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text.secondary,
-    marginLeft: spacing.xs,
-  },
-  activeStatusText: {
-    color: colors.alert.error,
   },
   timeContainer: {
     marginBottom: spacing.md,
